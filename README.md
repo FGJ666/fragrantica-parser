@@ -1,4 +1,4 @@
-# README for Fragrantica Scraper
+# Fragrantica Scraper
 
 ## Overview
 
