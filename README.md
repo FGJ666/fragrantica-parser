@@ -19,7 +19,3 @@ Additionally, make sure you have the Chrome WebDriver installed and accessible f
 - Ensure that the paths to your CSV files are correct.
 - Adjust the number of links to scrape according to your needs by modifying the range in the scraping loop.
 - Be aware of website scraping policies and handle requests responsibly to avoid getting blocked.
-
-## License
-
-This project is licensed under the MIT License.
