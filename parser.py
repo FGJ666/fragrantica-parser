@@ -72,8 +72,88 @@ def get_wish(page: Page):
     print("Результат в виде словаря:", result)
 
 
-def flavor_evaluation():
-    pass
+def fragrance_evaluation(page: Page):
+    """
+    Получаем оценки пользователей о парфюме.
+    """
+    # Получаем первый набор строк, представляющий блоки с оценками.
+    rows = page.locator(
+        "div[style='display: flex; justify-content: space-evenly;']"
+    ).first
+
+    # Ищем названия критериев оценки внутри строк.
+    name = rows.locator("div[style='display: flex; justify-content: center;']")
+
+    # Ищем графики оценок (ширину блоков, представляющих процентные значения).
+    evaluations = rows.locator(".voting-small-chart-size div div")
+
+    # Считаем количество критериев оценки.
+    count = name.count()
+
+    # Инициализируем пустой словарь для сохранения результатов.
+    result = {}
+
+    # Проходим по каждому критерию.
+    for i in range(count):
+        # Получаем текстовое название критерия оценки.
+        text = name.nth(i).inner_text()
+
+        # Получаем стиль графика, чтобы извлечь процентное значение.
+        chart = evaluations.nth(i).get_attribute("style")
+
+        # Проверяем, если в стиле есть параметр "width".
+        if "width:" in chart:
+            # Извлекаем значение ширины графика (процент).
+            width_value = chart.split("width:")[1].split(";")[0].strip()
+
+            # Добавляем текст и значение в результат, если они не пустые.
+            if text and width_value:
+                result[text] = width_value
+
+    # Выводим словарь с результатами оценок.
+    print("Результат в виде словаря:", result)
+
+
+def fragrance_season(page: Page):
+    """
+    Получаем оценки пользователей о подходящем сезоне.
+    """
+    # Получаем первый набор строк, представляющий блоки с оценками.
+    rows = page.locator(
+        "div[style='display: flex; justify-content: space-evenly;']"
+    ).nth(1)
+
+    # Ищем названия критериев оценки внутри строк.
+    name = rows.locator("div[style='display: flex; justify-content: center;']")
+
+    # Ищем графики оценок (ширину блоков, представляющих процентные значения).
+    evaluations = rows.locator(".voting-small-chart-size div div")
+
+    # Считаем количество критериев оценки.
+    count = name.count()
+
+    # Инициализируем пустой словарь для сохранения результатов.
+    result = {}
+
+    # Проходим по каждому критерию.
+    for i in range(count):
+        # Получаем текстовое название критерия оценки.
+        text = name.nth(i).inner_text()
+
+        # Получаем стиль графика, чтобы извлечь процентное значение.
+        chart = evaluations.nth(i).get_attribute("style")
+
+        # Проверяем, если в стиле есть параметр "width".
+        if "width:" in chart:
+            # Извлекаем значение ширины графика (процент).
+            width_value = chart.split("width:")[1].split(";")[0].strip()
+
+            # Добавляем текст и значение в результат, если они не пустые.
+            if text and width_value:
+                result[text] = width_value
+
+    # Выводим словарь с результатами оценок.
+    print("Результат в виде словаря:", result)
 
 
 # Основной блок
@@ -86,6 +166,8 @@ with sync_playwright() as p:
     navigate_to_fragrantica(page)
     get_main_accords(page)
     get_wish(page)
+    fragrance_evaluation(page)
+    fragrance_season(page)
 
     # Ожидание перед закрытием браузера
     input("Нажмите Enter, чтобы закрыть браузер...")
