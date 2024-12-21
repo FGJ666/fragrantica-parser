@@ -5,7 +5,11 @@ def navigate_to_fragrantica(page: Page):
     """
     Получение названия парфюма
     """
-    page.goto("https://www.fragrantica.com/perfume/By-Kilian/Angels-Share-62615.html")
+    page.goto(
+        "https://www.fragrantica.com/perfume/Giorgio-Armani/Emporio-Armani-Stronger-With-You-Intensely-52802.html",
+        # "https://www.fragrantica.com/perfume/By-Kilian/Angels-Share-62615.html",
+        timeout=60000,
+    )
 
     locator = page.locator("div#toptop h1")
     title_text = locator.inner_text()  # или text_content()
@@ -72,7 +76,7 @@ def get_wish(page: Page):
     print("Результат в виде словаря:", result)
 
 
-def fragrance_evaluation(page: Page):
+def get_fragrance_evaluation(page: Page):
     """
     Получаем оценки пользователей о парфюме.
     """
@@ -114,7 +118,7 @@ def fragrance_evaluation(page: Page):
     print("Результат в виде словаря:", result)
 
 
-def fragrance_season(page: Page):
+def get_fragrance_season(page: Page):
     """
     Получаем оценки пользователей о подходящем сезоне.
     """
@@ -156,6 +160,38 @@ def fragrance_season(page: Page):
     print("Результат в виде словаря:", result)
 
 
+def get_rating(page: Page):
+    """
+    Получение рейтинга
+    """
+    rating = page.locator("span[itemprop='ratingValue']").inner_text()
+    votes = page.locator("span[itemprop='ratingCount']").inner_text().replace(",", "")
+
+    print(f"Рейтинг: {rating}\nГолосов: {votes}")
+
+
+def get_perfume_pyramid(page: Page):
+    """
+    Получение пирамиды аромата
+    """
+    # Селектор для всех нот
+    notes_selector = "div[style='display: flex; justify-content: center; text-align: center; flex-flow: wrap; align-items: flex-end; padding: 0.5rem;']"
+
+    # Получаем все ноты
+    notes_elements = page.locator(notes_selector)
+
+    # Имена нот
+    notes_names = ["Top Notes", "Middle Notes", "Base Notes"]
+
+    # Создаем словарь с нотами
+    pyramid = {
+        notes_names[i]: notes_elements.nth(i).inner_text().split("\n")
+        for i in range(notes_elements.count())
+    }
+
+    print(pyramid)
+
+
 # Основной блок
 with sync_playwright() as p:
     # Запуск браузера в режиме с графическим интерфейсом
@@ -166,8 +202,10 @@ with sync_playwright() as p:
     navigate_to_fragrantica(page)
     get_main_accords(page)
     get_wish(page)
-    fragrance_evaluation(page)
-    fragrance_season(page)
+    get_fragrance_evaluation(page)
+    get_fragrance_season(page)
+    get_rating(page)
+    get_perfume_pyramid(page)
 
     # Ожидание перед закрытием браузера
     input("Нажмите Enter, чтобы закрыть браузер...")
