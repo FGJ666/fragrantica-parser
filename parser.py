@@ -34,14 +34,16 @@ def get_main_accords(page: Page):
 
         # Извлекаем значение width
         if style_attr and "width:" in style_attr:
-            width_value = style_attr.split("width:")[1].split(";")[0].strip()
+            width_value = (
+                style_attr.split("width:")[1].split(";")[0].strip().replace("%", "")
+            )
 
         # Добавляем текст и ширину в словарь
         if text and width_value:
             accord_data[text] = width_value
 
     # Вывод результата
-    print("Результат в виде словаря:", accord_data)
+    print("Main accords:", accord_data)
 
 
 def get_wish(page: Page):
@@ -68,12 +70,14 @@ def get_wish(page: Page):
         # width_value = style_attr.split("width:")[1].split(";")[0].strip()
 
         if "width:" in style_attr:
-            width_value = style_attr.split("width:")[1].split(";")[0].strip()
+            width_value = (
+                style_attr.split("width:")[1].split(";")[0].strip().replace("%", "")
+            )
 
             # Добавляем данные в словарь
             if text and width_value:
                 result[text] = width_value
-    print("Результат в виде словаря:", result)
+    print("Желания:", result)
 
 
 def get_fragrance_evaluation(page: Page):
@@ -108,14 +112,16 @@ def get_fragrance_evaluation(page: Page):
         # Проверяем, если в стиле есть параметр "width".
         if "width:" in chart:
             # Извлекаем значение ширины графика (процент).
-            width_value = chart.split("width:")[1].split(";")[0].strip()
+            width_value = (
+                chart.split("width:")[1].split(";")[0].strip().replace("%", "")
+            )
 
             # Добавляем текст и значение в результат, если они не пустые.
             if text and width_value:
                 result[text] = width_value
 
     # Выводим словарь с результатами оценок.
-    print("Результат в виде словаря:", result)
+    print("Оценки:", result)
 
 
 def get_fragrance_season(page: Page):
@@ -150,14 +156,16 @@ def get_fragrance_season(page: Page):
         # Проверяем, если в стиле есть параметр "width".
         if "width:" in chart:
             # Извлекаем значение ширины графика (процент).
-            width_value = chart.split("width:")[1].split(";")[0].strip()
+            width_value = (
+                chart.split("width:")[1].split(";")[0].strip().replace("%", "")
+            )
 
             # Добавляем текст и значение в результат, если они не пустые.
             if text and width_value:
                 result[text] = width_value
 
     # Выводим словарь с результатами оценок.
-    print("Результат в виде словаря:", result)
+    print("Сезонность:", result)
 
 
 def get_rating(page: Page):
@@ -192,6 +200,54 @@ def get_perfume_pyramid(page: Page):
     print(pyramid)
 
 
+def get_longevity(page: Page):
+    """
+    получение отзывов о стойкости аромата
+    """
+    longevity = page.locator("div[class='grid-x grid-margin-x']")
+    longevity_vote = {}
+    for i in range(2, 6):
+        vote = longevity.nth(i).inner_text().split()
+        longevity_vote[vote[0]] = vote[1]
+    print(longevity_vote)
+
+
+def get_sillage(page: Page):
+    """
+    получение отзывов о шлейфе аромата
+    """
+    sillage = page.locator("div[class='grid-x grid-margin-x']")
+    sillage_vote = {}
+    for i in range(7, 10):
+        vote = sillage.nth(i).inner_text().split()
+        sillage_vote[vote[0]] = vote[1]
+    print(sillage_vote)
+
+
+def get_gender(page: Page):
+    """
+    получение отзывов о гендерной принадлежности аромата
+    """
+    gender = page.locator("div[class='grid-x grid-margin-x']")
+    gender_vote = {}
+    for i in range(11, 15):
+        vote = gender.nth(i).inner_text().split()
+        gender_vote[vote[0]] = vote[1]
+    print(gender_vote)
+
+
+def get_price_value(page: Page):
+    """
+    получение отзывов о соответствии цены и качества аромата
+    """
+    price_value = page.locator("div[class='grid-x grid-margin-x']")
+    price_value_vote = {}
+    for i in range(16, 20):
+        vote = price_value.nth(i).inner_text().split()
+        price_value_vote[vote[0]] = vote[1]
+    print(price_value_vote)
+
+
 # Основной блок
 with sync_playwright() as p:
     # Запуск браузера в режиме с графическим интерфейсом
@@ -206,6 +262,10 @@ with sync_playwright() as p:
     get_fragrance_season(page)
     get_rating(page)
     get_perfume_pyramid(page)
+    get_longevity(page)
+    get_sillage(page)
+    get_gender(page)
+    get_price_value(page)
 
     # Ожидание перед закрытием браузера
     input("Нажмите Enter, чтобы закрыть браузер...")
