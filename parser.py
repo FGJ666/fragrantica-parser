@@ -1,4 +1,5 @@
 from playwright.sync_api import sync_playwright, Page, expect, TimeoutError
+import pandas as pd
 
 
 def navigate_to_fragrantica(page: Page):
