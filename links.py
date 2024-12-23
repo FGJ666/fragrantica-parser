@@ -4,6 +4,7 @@ import os
 
 path = r"data/fragrance_links.csv"
 get_elements = 99000
+global_timeout = 120000
 
 
 def save_on_disk(link):
@@ -26,22 +27,23 @@ def drop_dupl(path):
 def get_links(page: Page):
     """получаем ссылки на ароматы"""
 
-    page.goto("https://www.fragrantica.com/search/", timeout=60000)
+    page.goto("https://www.fragrantica.com/search/", timeout=global_timeout)
 
     elements = page.locator("div[class='cell card fr-news-box']")
 
     for i in range(get_elements):
         link_element = elements.nth(i).locator("div.card-section").nth(1).locator("a")
-        link = link_element.get_attribute("href")
+        link = link_element.get_attribute("href", timeout=global_timeout)
         save_on_disk(link)  # Сохраняем ссылку на диск
 
         if (i + 1) % 30 == 0 and i != 0:
-            page.get_by_text("Show more results").click()
+            page.get_by_text("Show more results").click(timeout=global_timeout)
             print(f"нажал {i // 30} раз")
+        elif (i + 1) % 100 == 0:
+            drop_dupl(path)
             print(f"Собрано ссылок: {i+1}")
 
     print(f"Собрано ссылок: {i+1}")
-    drop_dupl(path)
 
 
 def close_baner(page: Page):
@@ -52,7 +54,7 @@ def close_baner(page: Page):
         try:
             # Находим и нажимаем на кнопку закрытия баннера
             close_button = page.get_by_text("Продолжать, не поддерживая нас")
-            close_button.click()
+            close_button.click(timeout=global_timeout)
             print("Баннер закрыт.")
         except Exception as e:
             print(f"Не удалось нажать кнопку закрытия: {e}")
@@ -80,4 +82,4 @@ with sync_playwright() as p:
     input("Нажмите Enter, чтобы закрыть браузер...")
 
     # Закрытие браузера
-    # browser.close()
+    browser.close()
