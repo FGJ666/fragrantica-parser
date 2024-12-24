@@ -3,6 +3,15 @@ import pandas as pd
 import os
 import logging
 
+# Настройка логгера
+logging.basicConfig(
+    filename="data/error_log.txt",  # Путь к файлу лога
+    level=logging.ERROR,  # Уровень логирования (только ошибки)
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    encoding="utf-8",
+)
+
+# Параметры
 path = r"data/fragrance_links.csv"
 get_elements = 99000
 global_timeout = 5000
@@ -39,6 +48,7 @@ def close_baner(page: Page):
             print("Элемент не найден")
     except Exception as e:
         print(f"Не удалось нажать кнопку закрытия: {e}")
+        logging.error(f"Ошибка при закрытии баннера: {e}")
 
 
 def get_links(context: Page):
@@ -77,14 +87,20 @@ def get_links(context: Page):
                         print(f"Собрано ссылок: {i + 1}")
 
                 except Exception as e:
-                    print(f"Ошибка при обработке элемента {i} для года {year}: {e}")
+                    error_message = (
+                        f"Ошибка при обработке элемента {i} для года {year}: {e}"
+                    )
+                    print(error_message)
+                    logging.error(error_message)  # Логируем ошибку
                     page.close()
                     break
 
             print(f"Собрано ссылок: {i}")
             page.close()
         except Exception as e:
-            print(f"Ошибка при переходе на страницу для года {year}: {e}")
+            error_message = f"Ошибка при переходе на страницу для года {year}: {e}"
+            print(error_message)
+            logging.error(error_message)  # Логируем ошибку
             continue
 
 
@@ -97,7 +113,7 @@ with sync_playwright() as p:
     #     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
     # )
 
-    mobile = p.devices["iPhone 12"]
+    mobile = p.devices["iPhone 13"]
     context = browser.new_context(**mobile)
 
     get_links(context)  # Передаем контекст в функцию
