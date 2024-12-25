@@ -2,20 +2,27 @@ from playwright.sync_api import sync_playwright, Page, expect, TimeoutError
 import pandas as pd
 import os
 import logging
+import random
+import time
+import yaml
 
 # Настройка логгера
 logging.basicConfig(
-    filename="data/error_log.txt",  # Путь к файлу лога
+    filename="data/error_log.log",  # Путь к файлу лога
     level=logging.ERROR,  # Уровень логирования (только ошибки)
     format="%(asctime)s - %(levelname)s - %(message)s",
     encoding="utf-8",
 )
 
-# Параметры
-path = r"data/fragrance_links.csv"
-get_elements = 99000
-global_timeout = 5000
-web_page = "https://www.fragrantica.com/search/?godina={}%3A{}"
+# Загрузка парметров
+with open("config/config.yaml", "r") as file:
+    config = yaml.safe_load(file)
+
+web_page = config["web_page"]
+get_elements = config["get_elements"]
+global_timeout = config["global_timeout"]
+path = config["path"]
+user_agents = config["user_agents"]
 
 
 def save_on_disk(link):
@@ -53,70 +60,84 @@ def close_baner(page: Page):
 
 def get_links(context: Page):
     """получаем ссылки на ароматы"""
-    for year in range(2024, 1920, -1):
-        try:
-            page = context.new_page()
-            page.goto(
-                web_page.format(year, year + 1),
-                timeout=global_timeout,
-            )
-            print(f"Year: {year}")
+    for sex in ["male", "female", "unisex"]:
+        for year in range(2024, 1920, -1):
+            try:
+                page = context.new_page()
+                page.goto(
+                    web_page.format(start_year=year, end_year=year + 1, gender=sex),
+                    timeout=global_timeout,
+                )
+                print(f"Year: {year}")
 
-            # закрываем баннер на этой странице
-            close_baner(page)
+                # закрываем баннер на этой странице
+                close_baner(page)
 
-            elements = page.locator("div[class='cell card fr-news-box']")
+                elements = page.locator("div[class='cell card fr-news-box']")
 
-            for i in range(get_elements):
-                try:
-                    link_element = (
-                        elements.nth(i).locator("div.card-section").nth(1).locator("a")
-                    )
-                    link = link_element.get_attribute("href", timeout=global_timeout)
-                    save_on_disk(link)
-
-                    if (i + 1) % 30 == 0 and i != 0:
-                        page.get_by_text("Show more results").click(
-                            timeout=global_timeout
+                for i in range(get_elements):
+                    try:
+                        link_element = (
+                            elements.nth(i)
+                            .locator("div.card-section")
+                            .nth(1)
+                            .locator("a")
                         )
-                        print(f"нажал {i // 30} раз")
-                    elif (i + 1) % 100 == 0:
-                        # удаляем дубли
-                        drop_dupl(path)
+                        link = link_element.get_attribute(
+                            "href", timeout=global_timeout
+                        )
+                        save_on_disk(link)
 
-                        print(f"Собрано ссылок: {i + 1}")
+                        if (i + 1) % 30 == 0 and i != 0:
+                            page.get_by_text("Show more results").click(
+                                timeout=global_timeout
+                            )
+                            print(f"нажал {i // 30} раз")
+                        elif (i + 1) % 100 == 0:
+                            # удаляем дубли
+                            drop_dupl(path)
 
-                except Exception as e:
-                    error_message = (
-                        f"Ошибка при обработке элемента {i} для года {year}: {e}"
-                    )
-                    print(error_message)
-                    logging.error(error_message)  # Логируем ошибку
-                    page.close()
-                    break
+                            print(f"Собрано ссылок: {i + 1}")
 
-            print(f"Собрано ссылок: {i}")
-            page.close()
-        except Exception as e:
-            error_message = f"Ошибка при переходе на страницу для года {year}: {e}"
-            print(error_message)
-            logging.error(error_message)  # Логируем ошибку
-            continue
+                    except Exception as e:
+                        error_message = (
+                            f"Ошибка при обработке элемента {i} для года {year}: {e}"
+                        )
+                        print(error_message)
+                        logging.error(error_message)  # Логируем ошибку
+                        page.close()
+                        break
+
+                print(f"Собрано ссылок: {i}")
+                page.close()
+            except Exception as e:
+                error_message = f"Ошибка при переходе на страницу для года {year}: {e}"
+                print(error_message)
+                logging.error(error_message)  # Логируем ошибку
+                continue
 
 
 with sync_playwright() as p:
+    """
+    - Попробовать добавить куки и поискать еще способы сделать сбор незаметным
+    - вынести список user_agents в файл yaml
+    - в тот же файл вынести другие параметры конфигурации
+    """
     browser = p.chromium.launch(headless=False)
 
     # Контекст браузера
-    # context = browser.new_context(
-    #     viewport={"width": 1280, "height": 720},
-    #     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-    # )
+    context = browser.new_context(
+        viewport={"width": 1280, "height": 720},
+        user_agent=random.choice(user_agents),
+    )
 
-    mobile = p.devices["iPhone 13"]
-    context = browser.new_context(**mobile)
+    # mobile = p.devices["iPhone 13"]
+    # context = browser.new_context(**mobile)
 
     get_links(context)  # Передаем контекст в функцию
+
+    # Случайная задержка перед закрытием
+    time.sleep(random.uniform(2, 5))
 
     input("Нажмите Enter, чтобы закрыть браузер...")
     browser.close()
