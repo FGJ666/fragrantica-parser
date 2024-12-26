@@ -2,6 +2,15 @@ from playwright.sync_api import sync_playwright, Page
 import pandas as pd
 import random
 import yaml
+import logging
+
+# Настройка логгера
+logging.basicConfig(
+    filename="logs/error_log_data.log",  # Путь к файлу лога
+    level=logging.ERROR,  # Уровень логирования (только ошибки)
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    encoding="utf-8",
+)
 
 # Загрузка конфигурации из YAML
 with open("config/config.yaml", "r") as file:
@@ -10,7 +19,10 @@ paths = config["path"]
 user_agents = config["user_agents"]
 
 # Чтение ссылок из CSV файла
-links = pd.read_csv(paths)[:10]
+try:
+    links = pd.read_csv(paths)[:10]
+except Exception as e:
+    logging.error(f"Ошибка при чтении файла ссылок: {e}")
 
 
 def close_baner(page: Page):
@@ -29,6 +41,7 @@ def close_baner(page: Page):
             print("Элемент не найден")
     except Exception as e:
         print(f"Не удалось нажать кнопку закрытия: {e}")
+        logging.error(f"Ошибка при закрытии баннера: {e}")
 
 
 def get_fragrantica_data(page: Page, link: str, df):
@@ -144,6 +157,7 @@ def get_fragrantica_data(page: Page, link: str, df):
 
     except Exception as e:
         print(f"Ошибка при сборе данных с {link}: {e}")
+        logging.error(f"Ошибка при сборе данных с {link}: {e}")
         return df
 
     df = pd.concat(
