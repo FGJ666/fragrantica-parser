@@ -6,6 +6,7 @@ This repository contains two Python scripts for scraping data from Fragrantica.c
 
 The project is organized as follows:
 
+'''
 ├── config/
 │   └── config.yaml         # Configuration file for the scripts
 ├── data/
@@ -21,6 +22,7 @@ The project is organized as follows:
 ├── parser_data.py        # Script to collect detailed perfume data
 ├── parser_links.py       # Script to collect perfume page links
 └── README.md             # This file
+'''
 
 ## `parser_links.py`
 
