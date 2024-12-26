@@ -85,11 +85,3 @@ Both scripts utilize Python's `logging` module to record errors during execution
 
 -   `logs/error_log_links.log` for `parser_links.py`.
 -   `logs/error_log_data.log` for `parser_data.py`.
-
-## Contributing
-
-Feel free to fork the repository and submit pull requests.
-
-## License
-
-This project is licensed under the [Your License] License - see the [LICENSE.md](LICENSE.md) file for details.
