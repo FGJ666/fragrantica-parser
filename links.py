@@ -8,7 +8,7 @@ import yaml
 
 # Настройка логгера
 logging.basicConfig(
-    filename="data/error_log.log",  # Путь к файлу лога
+    filename="logs/error_log.log",  # Путь к файлу лога
     level=logging.ERROR,  # Уровень логирования (только ошибки)
     format="%(asctime)s - %(levelname)s - %(message)s",
     encoding="utf-8",
