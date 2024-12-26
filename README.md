@@ -1,72 +1,97 @@
-# Fragrantica Scraper
+```markdown
+# Fragrantica Web Scraper
 
-This repository contains a Python script that uses Playwright to scrape fragrance data from the Fragrantica website. The script extracts various details about a specific perfume, including its title, main accords, user evaluations, and more.
+This repository contains two Python scripts for scraping data from Fragrantica.com: `parser_links.py`, which collects links to perfume pages, and `parser_data.py`, which extracts detailed information about perfumes from those links.
 
-## Features
+## Project Structure
 
-- Navigate to a specific perfume page on Fragrantica.
-- Extract the perfume title.
-- Retrieve the main accords and their corresponding percentages.
-- Gather user votes on ownership and desire for the perfume.
-- Collect user evaluations on various criteria (e.g., longevity, sillage, gender suitability).
-- Extract the perfume rating and the number of votes.
-- Get the fragrance pyramid (top, middle, and base notes).
-- Assess the price-to-value ratio based on user feedback.
+The project is organized as follows:
 
-## Requirements
+```
+├── config/
+│   └── config.yaml         # Configuration file for the scripts
+├── data/
+│   └── fragrance_links.csv # CSV file storing the collected perfume links
+│   └── fragrance_data.csv  # CSV file storing the scraped data 
+├── logs/
+│   └── error_log_data.log  # Log file for errors during data parsing
+│   └── error_log_links.log # Log file for errors during link parsing
+├── src/
+│    # (This directory is currently empty, but can be used to add other scripts)
+├── .gitignore            # Files ignored by git
+├── environment.yml       # Environment file for setting up the virtual env
+├── parser_data.py        # Script to collect detailed perfume data
+├── parser_links.py       # Script to collect perfume page links
+└── README.md             # This file
+```
 
-- Python 3.7 or higher
-- Playwright library
+## `parser_links.py`
 
-## Installation
+This script gathers links to perfume pages from Fragrantica.com based on gender and year of release. It navigates the website, extracts links, and saves them to `data/fragrance_links.csv`. It iterates through gender categories (male, female, unisex) and scrapes links for perfumes released each year from 2024 down to 1920. The script handles "Show more results" buttons, logs errors to `logs/error_log_links.log`, closes popup banners, uses a configurable timeout, randomly chooses a user agent to mimic real users, and removes duplicate links. The configuration, including website links, the number of elements to parse from a page, timeout, path for saving data, and a list of user agents, is loaded from `config/config.yaml`.
 
-1. Clone the repository:
+## `parser_data.py`
 
-   ```bash
-   git clone git@github.com:FGJ666/fragrantica-parser.git
-   cd fragrantica-scraper
-   ```
+This script reads the perfume page links from `data/fragrance_links.csv` and extracts detailed information from each page on Fragrantica.com, saving the data to `data/fragrance_data.csv`. It extracts data such as the perfume title, main accords, votes, ratings, seasonality, fragrance notes, longevity, sillage, gender, and price-to-value ratings. The script logs errors to `logs/error_log_data.log` and closes popup banners. Configuration, such as the path to the links file and a list of user agents, is loaded from `config/config.yaml`.
 
-2. Create a `conda` environment using the provided `environment.yml` file:
+## Setup
 
-   ```bash
-   conda env create -f environment.yml
-   ```
+1.  **Clone the repository:**
 
-3. Activate the conda environment:
+    ```bash
+    git clone https://github.com/your_username/your_repository.git
+    cd your_repository
+    ```
 
-   ```bash
-   conda activate fragrantica-scraper
-   ```
+2.  **Create and activate a virtual environment using conda:**
 
-4. Install Playwright browsers:
+    ```bash
+    conda env create --file environment.yml
+    conda activate web_scraper
+    ```
 
-   ```bash
-   playwright install
-   ```
+    This command will create a new conda environment named `web_scraper` using the dependencies specified in `environment.yml`.  This file ensures that you have all the necessary Python packages at the correct versions to run the project.  The `conda activate web_scraper` command then activates this environment so that you are using these installed packages in your current shell.
+
+3.  **Install Playwright browsers:**
+
+    ```bash
+    playwright install
+    ```
+    This command downloads the necessary browser binaries for Playwright to operate correctly.
+
+4. **Configure the `config/config.yaml` file:**
+    Adjust parameters such as website links, timeouts, and output paths to your needs.
 
 ## Usage
 
-1. Open the script in your preferred code editor.
-2. Modify the URL in the `navigate_to_fragrantica` function if you want to scrape a different perfume.
-3. Run the script:
+To run the scripts:
 
-   ```bash
-   python fragrantica_scraper.py
-   ```
+1.  Ensure you have activated the conda environment (`conda activate web_scraper`).
+2.  Run `parser_links.py` first:
 
-4. Follow the prompts in the terminal. The browser will open and navigate to the specified perfume page. The extracted data will be printed in the terminal.
+    ```bash
+    python parser_links.py
+    ```
+    This will create the `data/fragrance_links.csv` file containing perfume links.
 
-## Functions
+3.  Then, run `parser_data.py`:
 
-- `navigate_to_fragrantica(page: Page)`: Navigates to the specified perfume page and retrieves the title.
-- `get_main_accords(page: Page)`: Extracts the main accords and their percentages.
-- `get_wish(page: Page)`: Finds user votes on ownership and desire for the perfume.
-- `get_fragrance_evaluation(page: Page)`: Collects user evaluations on various criteria.
-- `get_fragrance_season(page: Page)`: Retrieves user evaluations on the suitable season for the fragrance.
-- `get_rating(page: Page)`: Gets the perfume rating and the number of votes.
-- `get_perfume_pyramid(page: Page)`: Extracts the fragrance pyramid (top, middle, and base notes).
-- `get_longevity(page: Page)`: Gathers user feedback on the longevity of the fragrance.
-- `get_sillage(page: Page)`: Collects user feedback on the sillage of the fragrance.
-- `get_gender(page: Page)`: Retrieves user feedback on the gender suitability of the fragrance.
-- `get_price_value(page: Page)`: Gathers user feedback on the price-to-value ratio of the fragrance.
+    ```bash
+    python parser_data.py
+    ```
+    This script will use the generated `fragrance_links.csv` to collect data and save it to `data/fragrance_data.csv`.
+
+## Logging
+
+Both scripts utilize Python's `logging` module to record errors during execution. Error messages are saved in:
+
+-   `logs/error_log_links.log` for `parser_links.py`.
+-   `logs/error_log_data.log` for `parser_data.py`.
+
+## Contributing
+
+Feel free to fork the repository and submit pull requests.
+
+## License
+
+This project is licensed under the [Your License] License - see the [LICENSE.md](LICENSE.md) file for details.
+```
