@@ -1,4 +1,3 @@
-```markdown
 # Fragrantica Web Scraper
 
 This repository contains two Python scripts for scraping data from Fragrantica.com: `parser_links.py`, which collects links to perfume pages, and `parser_data.py`, which extracts detailed information about perfumes from those links.
@@ -7,7 +6,6 @@ This repository contains two Python scripts for scraping data from Fragrantica.c
 
 The project is organized as follows:
 
-```
 ├── config/
 │   └── config.yaml         # Configuration file for the scripts
 ├── data/
@@ -23,7 +21,6 @@ The project is organized as follows:
 ├── parser_data.py        # Script to collect detailed perfume data
 ├── parser_links.py       # Script to collect perfume page links
 └── README.md             # This file
-```
 
 ## `parser_links.py`
 
@@ -94,4 +91,3 @@ Feel free to fork the repository and submit pull requests.
 ## License
 
 This project is licensed under the [Your License] License - see the [LICENSE.md](LICENSE.md) file for details.
-```
