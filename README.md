@@ -48,16 +48,23 @@ This script reads the perfume page links from `data/fragrance_links.csv` and ext
     conda activate web_scraper
     ```
 
+    or
+    
+     ```bash
+    mamba env create -f environment.yaml
+    ```
+    
+
     This command will create a new conda environment named `web_scraper` using the dependencies specified in `environment.yml`.  This file ensures that you have all the necessary Python packages at the correct versions to run the project.  The `conda activate web_scraper` command then activates this environment so that you are using these installed packages in your current shell.
 
-3.  **Install Playwright browsers:**
+4.  **Install Playwright browsers:**
 
     ```bash
     playwright install
     ```
     This command downloads the necessary browser binaries for Playwright to operate correctly.
 
-4. **Configure the `config/config.yaml` file:**
+5. **Configure the `config/config.yaml` file:**
     Adjust parameters such as website links, timeouts, and output paths to your needs.
 
 ## Usage
