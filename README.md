@@ -1,3 +1,5 @@
+
+
 # Fragrantica Web Scraper
 
 This repository contains two Python scripts for scraping data from Fragrantica.com: `parser_links.py`, which collects links to perfume pages, and `parser_data.py`, which extracts detailed information about perfumes from those links.
@@ -51,7 +53,7 @@ This script reads the perfume page links from `data/fragrance_links.csv` and ext
     or
     
      ```bash
-    mamba env create -f environment.yaml
+    mamba env create -f environment.yml
     ```
     
 
